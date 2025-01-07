@@ -1,6 +1,13 @@
 # Use stable Node.js image
 FROM node:latest
 
+# Install bash and git tools
+RUN apt-get update && apt-get install -y \
+    bash \
+    bash-completion \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set working directory inside the container
 WORKDIR /app
 
