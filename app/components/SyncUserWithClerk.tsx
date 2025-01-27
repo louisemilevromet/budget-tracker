@@ -19,9 +19,10 @@ export const SyncUserWithClerk = () => {
           name: user.fullName ?? "",
           email: user.emailAddresses[0].emailAddress ?? "",
           profilePictureUrl: user.imageUrl ?? "",
+          currency: "",
         });
       } catch (error) {
-        throw new Error("Failed to sync user with Clerk");
+        throw Error("Failed to sync user with Clerk");
       }
     };
 

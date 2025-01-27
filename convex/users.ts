@@ -7,12 +7,13 @@ export const updateUser = mutation({
     name: v.string(),
     email: v.string(),
     profilePictureUrl: v.optional(v.string()),
+    currency: v.string(),
   },
-  handler: async (ctx, { clerkId, name, email, profilePictureUrl }) => {
+  handler: async (ctx, { clerkId, name, email, profilePictureUrl, currency }) => {
     // Create a user constant to check if the user exists
     const user = await ctx.db
       .query("users")
-      .withIndex("by_email", (q) => q.eq("email", email))
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
       .first();
 
     // If user does not exist, create a new user
@@ -22,19 +23,32 @@ export const updateUser = mutation({
         name,
         email,
         profilePictureUrl: profilePictureUrl ?? "",
+        currency,
       });
       return newUser;
     }
 
-    // If user exists, update the user
-    if (user) {
-      await ctx.db.patch(user._id, {
-        clerkId,
-        name,
-        email,
-        profilePictureUrl: profilePictureUrl ?? "",
-      });
-      return user._id;
-    }
+    const updatedUser = await ctx.db.patch(user._id, {
+      name,
+      email,
+      profilePictureUrl: profilePictureUrl ?? user.profilePictureUrl,
+      currency: currency || user.currency,
+    });
+    return updatedUser;
   },
 });
+
+export const getUserCurrency = query({
+  args: { clerkId: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    return user
+  },
+});
+
+
+

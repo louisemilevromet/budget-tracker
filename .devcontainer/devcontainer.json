@@ -11,5 +11,7 @@
 			"upgradePackages": false,
 			"username": "automatic"
 		}
-	}
+	},
+	"appPort": ["3000:3000"],
+	"forwardPorts": [3000]
 }

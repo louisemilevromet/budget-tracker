@@ -15,6 +15,9 @@ WORKDIR /app
 # to optimize Docker cache when installing dependencies
 COPY package*.json ./
 
+# Debug: 
+RUN ls -la
+
 # Install dependencies
 RUN npm install
 
