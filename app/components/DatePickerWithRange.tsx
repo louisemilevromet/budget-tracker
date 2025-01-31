@@ -21,7 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface DatePickerWithRangeProps extends React.HTMLAttributes<HTMLDivElement> {
+interface DatePickerWithRangeProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   onDateChange?: (date: DateRange | undefined) => void;
 }
 
@@ -37,9 +38,21 @@ export function DatePickerWithRange({
   const handlePeriodChange = (value: string) => {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+    const lastDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    );
+    const firstDayOfLastMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      1
+    );
+    const lastDayOfLastMonth = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      0
+    );
     const firstDayOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
     const lastDayOfLastYear = new Date(today.getFullYear() - 1, 11, 31);
     const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
@@ -95,10 +108,7 @@ export function DatePickerWithRange({
         <Button
           id="date"
           variant={"outline"}
-          className={cn(
-            "justify-start text-left font-normal",
-            
-          )}
+          className={cn("justify-start text-left font-normal")}
         >
           <CalendarRangeIcon className="mr-2 h-4 w-4" />
           {date?.from ? (
@@ -115,7 +125,7 @@ export function DatePickerWithRange({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 flex flex-col gap-2" align="start">
+      <PopoverContent className="w-auto p-0 flex flex-col gap-2" align="end">
         <Select onValueChange={handlePeriodChange} defaultValue="this-month">
           <SelectTrigger className="!border-none">
             <SelectValue placeholder="Select a period" />

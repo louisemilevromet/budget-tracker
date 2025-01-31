@@ -22,7 +22,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface CreateCategoryProps {
   isOpen: boolean;
-  onClose: (newCategoryName?: string) => void;
+  onClose: (newCategoryName?: string, newCategoryId?: string) => void;
   type: "income" | "expense";
   onCancel?: () => void;
 }
@@ -86,14 +86,16 @@ const CreateCategory: React.FC<CreateCategoryProps> = ({
       return;
     }
     try {
-      await createCategory({
+      const newCategoryId = await createCategory({
         clerkId: user?.id ?? "",
         type: type,
-        name: categoryData.name.charAt(0).toUpperCase() + categoryData.name.slice(1),
+        name:
+          categoryData.name.charAt(0).toUpperCase() +
+          categoryData.name.slice(1),
         icon: categoryData.icon,
       });
       setError("");
-      onClose(categoryData.name.charAt(0).toUpperCase() + categoryData.name.slice(1));
+      onClose(categoryData.name, newCategoryId);
     } catch (error: any) {
       setError("A category with this name already exists");
       return;
@@ -101,9 +103,7 @@ const CreateCategory: React.FC<CreateCategoryProps> = ({
   };
 
   return (
-    <Dialog
-      open={isOpen}
-    >
+    <Dialog open={isOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -180,9 +180,9 @@ const CreateCategory: React.FC<CreateCategoryProps> = ({
             </div>
           </div>
           <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => {
                 onClose();
                 onCancel?.();

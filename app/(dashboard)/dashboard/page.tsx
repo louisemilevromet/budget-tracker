@@ -10,7 +10,9 @@ import CreateTransaction from "@/app/components/CreateTransaction";
 const DashboardPage = () => {
   const { user } = useUser();
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-  const [transactionType, setTransactionType] = useState<"income" | "expense">("income");
+  const [transactionType, setTransactionType] = useState<"income" | "expense">(
+    "income"
+  );
 
   const handleOpenTransaction = (type: "income" | "expense") => {
     setTransactionType(type);
@@ -23,7 +25,7 @@ const DashboardPage = () => {
 
   return (
     <section>
-      <div className="flex justify-between items-center flex-wrap gap-4 mt-16">
+      <div className="flex justify-between items-center flex-wrap gap-4 mt-16 ">
         <h2 className="text-2xl font-bold">Welcome, {user?.firstName}! 👋</h2>
         <div className="flex gap-4">
           <Button

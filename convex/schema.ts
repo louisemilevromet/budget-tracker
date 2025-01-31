@@ -51,4 +51,5 @@ export default defineSchema({
     income: v.number(),
     expenses: v.number(),
   }).index("by_user_id", ["userId"]),
+
 });

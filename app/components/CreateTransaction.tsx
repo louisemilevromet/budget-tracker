@@ -30,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import CreateCategory from "./CreateCategory";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -67,6 +68,7 @@ const CreateTransaction: React.FC<TransactionProps> = ({
   });
 
   const { user } = useUser();
+  const { toast } = useToast();
   const [value, setValue] = React.useState("");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
@@ -95,14 +97,17 @@ const CreateTransaction: React.FC<TransactionProps> = ({
     e.preventDefault();
     onSubmit(transactionData);
     onClose(false);
-    console.log(transactionData, "transactionData.category")
     await createTransaction({
-        clerkId: user?.id ?? "",
-        type: type,
-        amount: transactionData.amount,
-        categoryId: transactionData.categoryId,
-        description: transactionData.description,
-        date: transactionData.date.toISOString(),
+      clerkId: user?.id ?? "",
+      type: type,
+      amount: transactionData.amount,
+      categoryId: transactionData.categoryId as any,
+      description: transactionData.description,
+      date: transactionData.date.toISOString(),
+    });
+    toast({
+      variant: "success",
+      description: "🎉 Transaction added successfully",
     });
   };
 
@@ -111,7 +116,16 @@ const CreateTransaction: React.FC<TransactionProps> = ({
     setIsCategoryModalOpen(true);
   };
 
-  const handleCloseCategoryModal = () => {
+  const handleCloseCategoryModal = (
+    newCategoryName: string,
+    newCategoryId: string
+  ) => {
+    setValue(newCategoryName);
+    setTransactionData((prev) => ({
+      ...prev,
+      category: newCategoryName,
+      categoryId: newCategoryId,
+    }));
     setIsCategoryModalOpen(false);
     onClose(true);
   };
@@ -165,7 +179,10 @@ const CreateTransaction: React.FC<TransactionProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="category">Category</Label>
-                  <Popover open={isCategorySelectOpen} onOpenChange={setIsCategorySelectOpen}>
+                  <Popover
+                    open={isCategorySelectOpen}
+                    onOpenChange={setIsCategorySelectOpen}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -271,7 +288,11 @@ const CreateTransaction: React.FC<TransactionProps> = ({
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onClose(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onClose(false)}
+              >
                 Cancel
               </Button>
               <Button
@@ -280,6 +301,7 @@ const CreateTransaction: React.FC<TransactionProps> = ({
                 disabled={
                   transactionData.amount <= 0 || !transactionData.category
                 }
+                onClick={() => {}}
               >
                 Add {type}
               </Button>
@@ -290,7 +312,9 @@ const CreateTransaction: React.FC<TransactionProps> = ({
 
       <CreateCategory
         isOpen={isCategoryModalOpen}
-        onClose={() => handleCloseCategoryModal()}
+        onClose={(newCategoryName?: string, newCategoryId?: string) =>
+          handleCloseCategoryModal(newCategoryName ?? "", newCategoryId ?? "")
+        }
         type={type}
         onCancel={() => {
           setIsCategoryModalOpen(false);
