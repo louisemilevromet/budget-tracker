@@ -9,7 +9,10 @@ export const updateUser = mutation({
     profilePictureUrl: v.optional(v.string()),
     currency: v.string(),
   },
-  handler: async (ctx, { clerkId, name, email, profilePictureUrl, currency }) => {
+  handler: async (
+    ctx,
+    { clerkId, name, email, profilePictureUrl, currency }
+  ) => {
     // Create a user constant to check if the user exists
     const user = await ctx.db
       .query("users")
@@ -39,16 +42,13 @@ export const updateUser = mutation({
 });
 
 export const getUserCurrency = query({
-  args: { clerkId: v.optional(v.string()) },
+  args: { clerkId: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
       .first();
 
-    return user
+    return user;
   },
 });
-
-
-
