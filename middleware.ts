@@ -16,8 +16,6 @@ export default clerkMiddleware(async (auth, req) => {
       clerkId: userId,
     });
 
-    console.log("user", user);
-
     if (!user || user?.currency === "") {
       return Response.redirect(new URL("/wizard", req.url));
     } else {

@@ -17,22 +17,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" style={{colorScheme:"dark"}}>
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <body>
         <ClerkProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
-            disableTransitionOnChange>
-              <ConvexClientProvider>
-                <SyncUserWithClerk />
-                {children}
-              </ConvexClientProvider>
-            </ThemeProvider>
-          </ClerkProvider>
-        </body>
-      </html>
-
+            disableTransitionOnChange
+          >
+            <ConvexClientProvider>
+              <SyncUserWithClerk />
+              {children}
+            </ConvexClientProvider>
+          </ThemeProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

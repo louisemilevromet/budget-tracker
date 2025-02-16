@@ -69,7 +69,7 @@ const CreateTransaction: React.FC<TransactionProps> = ({
 
   const { user } = useUser();
   const { toast } = useToast();
-  const [value, setValue] = React.useState("");
+  const [categoryName, setCategoryName] = React.useState("");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
 
@@ -97,18 +97,36 @@ const CreateTransaction: React.FC<TransactionProps> = ({
     e.preventDefault();
     onSubmit(transactionData);
     onClose(false);
-    await createTransaction({
-      clerkId: user?.id ?? "",
-      type: type,
-      amount: transactionData.amount,
-      categoryId: transactionData.categoryId as any,
-      description: transactionData.description,
-      date: transactionData.date.toISOString(),
-    });
-    toast({
-      variant: "success",
-      description: "🎉 Transaction added successfully",
-    });
+    try {
+      await createTransaction({
+        clerkId: user?.id ?? "",
+        type: type,
+        amount: transactionData.amount,
+        categoryId: transactionData.categoryId as any,
+        description: transactionData.description,
+        date: transactionData.date.toISOString(),
+      });
+      toast({
+        variant: "success",
+        description: "🎉 Transaction added successfully",
+        duration: 3000,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "🚨 Error adding transaction",
+        duration: 3000,
+      });
+    } finally {
+      setTransactionData((prev) => ({
+        ...prev,
+        amount: 0,
+        category: "",
+        categoryId: "",
+        description: "",
+        date: new Date(),
+      }));
+    }
   };
 
   const handleOpenCategoryModal = () => {
@@ -120,7 +138,7 @@ const CreateTransaction: React.FC<TransactionProps> = ({
     newCategoryName: string,
     newCategoryId: string
   ) => {
-    setValue(newCategoryName);
+    setCategoryName(newCategoryName);
     setTransactionData((prev) => ({
       ...prev,
       category: newCategoryName,
@@ -132,7 +150,21 @@ const CreateTransaction: React.FC<TransactionProps> = ({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={() => {
+          onClose(false);
+          setCategoryName("");
+          setTransactionData((prev) => ({
+            ...prev,
+            category: "",
+            categoryId: "",
+            description: "",
+            amount: 0,
+            date: new Date(),
+          }));
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -190,14 +222,9 @@ const CreateTransaction: React.FC<TransactionProps> = ({
                         aria-expanded={isCategorySelectOpen}
                         className="w-[200px] justify-between"
                       >
-                        {value
-                          ? categories?.find(
-                              (category) => category.name === value
-                            )?.name +
-                            " " +
-                            categories?.find(
-                              (category) => category.name === value
-                            )?.icon
+                        {transactionData.categoryId && categories
+                          ? `${categories.find((c) => c._id === transactionData.categoryId)?.name} 
+                           ${categories.find((c) => c._id === transactionData.categoryId)?.icon}`
                           : "Select category..."}
                         <ChevronsUpDown className="opacity-50" />
                       </Button>
@@ -223,8 +250,10 @@ const CreateTransaction: React.FC<TransactionProps> = ({
                                 key={category.name}
                                 value={category.name}
                                 onSelect={(currentValue) => {
-                                  setValue(
-                                    currentValue === value ? "" : currentValue
+                                  setCategoryName(
+                                    currentValue === categoryName
+                                      ? ""
+                                      : currentValue
                                   );
                                   setTransactionData((prev) => ({
                                     ...prev,
@@ -238,7 +267,7 @@ const CreateTransaction: React.FC<TransactionProps> = ({
                                 <Check
                                   className={cn(
                                     "ml-auto",
-                                    value === category.name
+                                    categoryName === category.name
                                       ? "opacity-100"
                                       : "opacity-0"
                                   )}
@@ -291,7 +320,19 @@ const CreateTransaction: React.FC<TransactionProps> = ({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onClose(false)}
+                onClick={() => {
+                  onClose(false);
+                  setTransactionData((prev) => ({
+                    ...prev,
+                    amount: 0,
+                    type: type,
+                    category: "",
+                    categoryId: "",
+                    date: new Date(),
+                    description: "",
+                  }));
+                  setCategoryName("");
+                }}
               >
                 Cancel
               </Button>

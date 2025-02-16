@@ -1,11 +1,20 @@
-import React from 'react'
+"use client";
+import Transactions from "@/app/components/Transactions";
+import { useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 function page() {
+  const { user } = useUser();
+  const transactions = useQuery(api.transactions.getAllTransactionsByClerkId, {
+    clerkId: user?.id ?? "",
+  });
+
   return (
-    <div>
-      <h1>Transactions</h1>
+    <div className="w-full h-screen">
+      <Transactions transactions={transactions} />
     </div>
-  )
+  );
 }
 
-export default page
+export default page;

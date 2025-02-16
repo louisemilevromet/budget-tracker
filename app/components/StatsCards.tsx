@@ -18,10 +18,15 @@ const StatsCards = ({
   const { user } = useUser();
 
   const isNegative =
-    (incomeTransactions?.reduce((acc, curr) => acc + curr.amount, 0) ?? 0) -
-      (expenseTransactions?.reduce((acc, curr) => acc + curr.amount, 0) ?? 0) <
+    (incomeTransactions?.reduce(
+      (acc: number, curr: any) => acc + curr.amount,
+      0
+    ) ?? 0) -
+      (expenseTransactions?.reduce(
+        (acc: number, curr: any) => acc + curr.amount,
+        0
+      ) ?? 0) <
     0;
-
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {loading ? (
@@ -52,7 +57,7 @@ const StatsCards = ({
               <div className="flex flex-col">
                 <p className="text-gray-500">Income</p>
                 <div className="text-2xl font-bold">
-                  {`$${incomeTransactions?.reduce((acc, curr) => acc + curr.amount, 0).toLocaleString()}`}
+                  {`$${incomeTransactions?.reduce((acc: number, curr: any) => acc + curr.amount, 0).toLocaleString()}`}
                 </div>
               </div>
             </div>
@@ -77,7 +82,7 @@ const StatsCards = ({
               <div className="flex flex-col">
                 <p className="text-gray-500">Expense</p>
                 <div className="text-2xl font-bold">
-                  {`$${expenseTransactions?.reduce((acc, curr) => acc + curr.amount, 0).toLocaleString()}`}
+                  {`$${expenseTransactions?.reduce((acc: number, curr: any) => acc + curr.amount, 0).toLocaleString()}`}
                 </div>
               </div>
             </div>
@@ -105,11 +110,11 @@ const StatsCards = ({
                 <div className="text-2xl font-bold">
                   {`${isNegative ? "-$ " : "$"}${Math.abs(
                     (incomeTransactions?.reduce(
-                      (acc, curr) => acc + curr.amount,
+                      (acc: number, curr: any) => acc + curr.amount,
                       0
                     ) ?? 0) -
                       (expenseTransactions?.reduce(
-                        (acc, curr) => acc + curr.amount,
+                        (acc: number, curr: any) => acc + curr.amount,
                         0
                       ) ?? 0)
                   ).toLocaleString()}`}

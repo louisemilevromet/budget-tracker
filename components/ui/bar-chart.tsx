@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -45,6 +46,7 @@ const chartConfig = {
 
 const BarChartMultiple = () => {
   const [year, setYear] = useState<string>("2025");
+  const [loading, setLoading] = useState(true);
 
   const { user } = useUser();
 
@@ -77,6 +79,13 @@ const BarChartMultiple = () => {
     return totalAmount;
   };
 
+  useEffect(() => {
+    if (incomeTransactions && expenseTransactions) {
+      setLoading(false);
+      console.log("here");
+    }
+  }, [incomeTransactions, expenseTransactions]);
+
   const incomeTransactionsByMonth = Array.from({ length: 12 }, (_, i) => {
     return {
       month: i + 1,
@@ -101,71 +110,81 @@ const BarChartMultiple = () => {
   }));
 
   return (
-    <Card className="p-6 flex flex-col gap-8">
-      <CardHeader className="flex items-end p-0">
-        <div className="w-[100px]">
-          <Select defaultValue={year} onValueChange={(value) => setYear(value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="2025">2025</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardHeader>
-      <ChartContainer config={chartConfig}>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            accessibilityLayer
-            data={data}
-            margin={{ left: 0, right: 20 }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value) => `$${value.toLocaleString()}`}
-              width={60}
-            />
-            <ChartTooltip
-              cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
-              content={<ChartTooltipContent />}
-            />
-            <Bar
-              dataKey="income"
-              fill="#10b981"
-              radius={4}
-              activeBar={{
-                fill: "#059669",
-                stroke: "#047857",
-                strokeWidth: 1,
-                radius: 4,
-              }}
-            />
-            <Bar
-              dataKey="expense"
-              fill="#ef4444"
-              radius={4}
-              activeBar={{
-                fill: "#dc2626",
-                stroke: "#b91c1c",
-                strokeWidth: 1,
-                radius: 4,
-              }}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartContainer>
-    </Card>
+    <>
+      {" "}
+      {loading ? (
+        <Skeleton className="p-6 rounded-xl border shadow h-[637px]" />
+      ) : (
+        <Card className="p-6 flex flex-col gap-8">
+          <CardHeader className="flex items-end p-0">
+            <div className="w-[100px]">
+              <Select
+                defaultValue={year}
+                onValueChange={(value) => setYear(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2025">2025</SelectItem>
+                  <SelectItem value="2024">2024</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <ChartContainer config={chartConfig}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                accessibilityLayer
+                data={data}
+                margin={{ left: 0, right: 20 }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value) => `$${value.toLocaleString()}`}
+                  width={60}
+                />
+                <ChartTooltip
+                  cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
+                  content={<ChartTooltipContent />}
+                />
+                <Bar
+                  dataKey="income"
+                  fill="#10b981"
+                  radius={4}
+                  activeBar={{
+                    fill: "#059669",
+                    stroke: "#047857",
+                    strokeWidth: 1,
+                    radius: 4,
+                  }}
+                />
+                <Bar
+                  dataKey="expense"
+                  fill="#ef4444"
+                  radius={4}
+                  activeBar={{
+                    fill: "#dc2626",
+                    stroke: "#b91c1c",
+                    strokeWidth: 1,
+                    radius: 4,
+                  }}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </Card>
+      )}
+    </>
   );
 };
 
