@@ -12,6 +12,8 @@ export const SyncUserWithClerk = () => {
   useEffect(() => {
     if (!user) return;
 
+    console.log("Syncing user with Clerk");
+
     const syncUser = async () => {
       try {
         await updateUser({
