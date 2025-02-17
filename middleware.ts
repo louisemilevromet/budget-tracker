@@ -13,25 +13,33 @@ const isProtectedRoute = createRouteMatcher([
   "/settings(.*)",
 ]);
 
+// Define public routes that should always be accessible
+const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)", "/"]);
+
 export default clerkMiddleware(async (auth, req) => {
-  // Protect routes first
+  const { userId } = await auth();
+
+  // Always allow access to public routes
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // Protect routes
   if (isProtectedRoute(req)) {
+    if (!userId) {
+      // Redirect to sign-in if not authenticated
+      return NextResponse.redirect(new URL("/sign-in", req.url));
+    }
+
     try {
       await auth.protect();
     } catch {
-      // If auth.protect() fails, redirect to home
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/sign-in", req.url));
     }
   }
 
-  const { userId } = await auth();
-
-  // Handle non-authenticated users
+  // If user is not authenticated, don't proceed further
   if (!userId) {
-    // Only redirect if trying to access protected routes
-    if (isProtectedRoute(req)) {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
     return NextResponse.next();
   }
 
@@ -59,7 +67,6 @@ export default clerkMiddleware(async (auth, req) => {
     }
   } catch (error) {
     console.error("Error fetching user:", error);
-    // In case of error, redirect to home
     return NextResponse.redirect(new URL("/", req.url));
   }
 
