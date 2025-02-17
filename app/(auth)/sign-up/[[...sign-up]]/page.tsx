@@ -1,11 +1,11 @@
-import { SignUp } from '@clerk/nextjs'
+import { SignUp } from "@clerk/nextjs";
 
 const SignUpPage = () => {
   return (
-    <div className='flex flex-col items-center justify-center h-screen'>
-      <SignUp />
+    <div className="flex flex-col items-center justify-center h-screen">
+      <SignUp fallbackRedirectUrl="/wizard" />
     </div>
-  )
-}
+  );
+};
 
-export default SignUpPage
+export default SignUpPage;

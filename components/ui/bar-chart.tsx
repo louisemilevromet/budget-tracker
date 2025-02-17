@@ -82,7 +82,6 @@ const BarChartMultiple = () => {
   useEffect(() => {
     if (incomeTransactions && expenseTransactions) {
       setLoading(false);
-      console.log("here");
     }
   }, [incomeTransactions, expenseTransactions]);
 

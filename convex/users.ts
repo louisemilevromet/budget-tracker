@@ -41,7 +41,7 @@ export const updateUser = mutation({
   },
 });
 
-export const getUserCurrency = query({
+export const getUserById = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.db

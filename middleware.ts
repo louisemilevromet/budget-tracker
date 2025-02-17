@@ -1,30 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
 
-const convexClient = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)", "/"]);
 
-// Define protected routes
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/wizard(.*)"]);
-
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-
-  // If user is connected and on the home page
-  if (userId && new URL(req.url).pathname === "/") {
-    const user = await convexClient.query(api.users.getUserCurrency, {
-      clerkId: userId,
-    });
-
-    if (!user || user?.currency === "") {
-      return Response.redirect(new URL("/wizard", req.url));
-    } else {
-      return Response.redirect(new URL("/dashboard", req.url));
-    }
-  }
-
-  // Only protect protected routes
-  if (isProtectedRoute(req)) {
+export default clerkMiddleware(async (auth, request) => {
+  if (!isPublicRoute(request)) {
     await auth.protect();
   }
 });

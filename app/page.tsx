@@ -1,10 +1,14 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import React from "react";
-import { SignIn } from "@clerk/nextjs";
 
 function page() {
   return (
     <div className="flex justify-center items-center h-screen">
-      <SignIn />
+      <p>Start budgeting now!</p>
+      <Button>
+        <Link href="/wizard">Go</Link>
+      </Button>
     </div>
   );
 }
