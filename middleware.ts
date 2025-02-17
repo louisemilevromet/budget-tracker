@@ -6,42 +6,61 @@ import { NextResponse } from "next/server";
 const convexClient = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 // Define protected routes
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/wizard(.*)"]);
+const isProtectedRoute = createRouteMatcher([
+  "/dashboard(.*)",
+  "/wizard(.*)",
+  "/transactions(.*)",
+  "/settings(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Protect routes first
+  if (isProtectedRoute(req)) {
+    try {
+      await auth.protect();
+    } catch {
+      // If auth.protect() fails, redirect to home
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
   const { userId } = await auth();
 
+  // Handle non-authenticated users
   if (!userId) {
-    if (!req.url.includes("/")) {
+    // Only redirect if trying to access protected routes
+    if (isProtectedRoute(req)) {
       return NextResponse.redirect(new URL("/", req.url));
     }
     return NextResponse.next();
   }
 
-  const user = await convexClient.query(api.users.getUserById, {
-    clerkId: userId,
-  });
+  // For authenticated users, check their setup status
+  try {
+    const user = await convexClient.query(api.users.getUserById, {
+      clerkId: userId,
+    });
 
-  if (!user || user.currency === "") {
-    if (!req.url.includes("/wizard") && !req.url.includes("/sign-out")) {
-      console.log("Redirecting to /wizard");
-      return NextResponse.redirect(new URL("/wizard", req.url));
+    // New user without currency setup
+    if (!user || user.currency === "") {
+      if (!req.url.includes("/wizard") && !req.url.includes("/sign-out")) {
+        return NextResponse.redirect(new URL("/wizard", req.url));
+      }
+    } else {
+      // User with complete setup
+      if (
+        !req.url.includes("/dashboard") &&
+        !req.url.includes("/sign-out") &&
+        !req.url.includes("/transactions") &&
+        !req.url.includes("/settings")
+      ) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
     }
-  } else {
-    if (
-      !req.url.includes("/dashboard") &&
-      !req.url.includes("/sign-out") &&
-      !req.url.includes("/transactions") &&
-      !req.url.includes("/settings")
-    ) {
-      console.log("Redirecting to /dashboard");
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
-  }
-
-  // Only protect protected routes
-  if (isProtectedRoute(req)) {
-    await auth.protect();
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    // In case of error, redirect to home
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
@@ -49,9 +68,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };
