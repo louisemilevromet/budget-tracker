@@ -4,9 +4,9 @@ import React from "react";
 
 function page() {
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen flex-col">
       <p>Start budgeting now!</p>
-      <Button>
+      <Button className="mt-4">
         <Link href="/wizard">Go</Link>
       </Button>
     </div>
