@@ -1,11 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
-import { NextResponse } from "next/server";
 
 const convexClient = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-// Define protected routes
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/wizard(.*)",
@@ -13,69 +11,41 @@ const isProtectedRoute = createRouteMatcher([
   "/settings(.*)",
 ]);
 
-// Define public routes that should always be accessible
-const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)", "/"]);
-
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
+  const pathname = new URL(req.url).pathname;
 
-  // Always allow access to public routes
-  if (isPublicRoute(req)) {
-    return NextResponse.next();
-  }
-
-  // Protect routes
-  if (isProtectedRoute(req)) {
-    if (!userId) {
-      // Redirect to sign-in if not authenticated
-      return NextResponse.redirect(new URL("/sign-in", req.url));
-    }
-
+  if (userId && pathname === "/") {
     try {
-      await auth.protect();
-    } catch {
-      return NextResponse.redirect(new URL("/sign-in", req.url));
+      const user = await convexClient.query(api.users.getUserById, {
+        clerkId: userId,
+      });
+
+      // Redirection basée sur l'état de l'utilisateur
+      if (!user || user?.currency === "") {
+        return Response.redirect(new URL("/wizard", req.url));
+      } else {
+        return Response.redirect(new URL("/dashboard", req.url));
+      }
+    } catch (error) {
+      // En cas d'erreur, rediriger vers le wizard par sécurité
+      console.error("Error fetching user:", error);
+      return Response.redirect(new URL("/wizard", req.url));
     }
   }
 
-  // If user is not authenticated, don't proceed further
-  if (!userId) {
-    return NextResponse.next();
+  if (isProtectedRoute(req)) {
+    await auth.protect();
   }
 
-  // For authenticated users, check their setup status
-  try {
-    const user = await convexClient.query(api.users.getUserById, {
-      clerkId: userId,
-    });
-
-    // New user without currency setup
-    if (!user || user.currency === "") {
-      if (!req.url.includes("/wizard") && !req.url.includes("/sign-out")) {
-        return NextResponse.redirect(new URL("/wizard", req.url));
-      }
-    } else {
-      // User with complete setup
-      if (
-        !req.url.includes("/dashboard") &&
-        !req.url.includes("/sign-out") &&
-        !req.url.includes("/transactions") &&
-        !req.url.includes("/settings")
-      ) {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
-      }
-    }
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  return NextResponse.next();
+  return;
 });
 
 export const config = {
   matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };
