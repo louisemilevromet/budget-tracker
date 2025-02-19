@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <body>
-        <ClerkProvider>
+        <ClerkProvider afterSignOutUrl="/">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
