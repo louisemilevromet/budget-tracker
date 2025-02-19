@@ -21,15 +21,12 @@ export default clerkMiddleware(async (auth, req) => {
         clerkId: userId,
       });
 
-      // Redirection basée sur l'état de l'utilisateur
       if (!user || user?.currency === "") {
         return Response.redirect(new URL("/wizard", req.url));
       } else {
         return Response.redirect(new URL("/dashboard", req.url));
       }
     } catch (error) {
-      // En cas d'erreur, rediriger vers le wizard par sécurité
-      console.error("Error fetching user:", error);
       return Response.redirect(new URL("/wizard", req.url));
     }
   }
