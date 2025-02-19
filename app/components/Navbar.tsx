@@ -9,6 +9,7 @@ import { ModeToggle } from "@/app/components/ModeToggle";
 import { useClerk } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
