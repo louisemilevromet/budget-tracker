@@ -10,6 +10,7 @@ import { useClerk } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { SignOutButton } from "@clerk/nextjs";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
@@ -20,10 +21,6 @@ const navItems = [
 const Navbar = () => {
   const pathname = usePathname();
   const { signOut } = useClerk();
-
-  const handleSignOut = () => {
-    signOut({ redirectUrl: "/" });
-  };
 
   return (
     <nav className="border-b">
@@ -59,9 +56,11 @@ const Navbar = () => {
             ))}
           </div>
           <ModeToggle />
-          <Button variant="ghost" size="icon" onClick={handleSignOut}>
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <SignOutButton signOutOptions={{ redirectUrl: "/" }}>
+            <Button variant="ghost" size="icon">
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </SignOutButton>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
