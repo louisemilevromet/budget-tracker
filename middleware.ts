@@ -15,6 +15,8 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   const pathname = new URL(req.url).pathname;
 
+  if (req.method === "POST") return;
+
   if (userId && pathname === "/") {
     try {
       const user = await convexClient.query(api.users.getUserById, {
