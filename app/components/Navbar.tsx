@@ -56,7 +56,7 @@ const Navbar = () => {
             ))}
           </div>
           <ModeToggle />
-          <SignOutButton signOutOptions={{ redirectUrl: "/" }}>
+          <SignOutButton>
             <Button variant="ghost" size="icon">
               <LogOut className="h-5 w-5" />
             </Button>
