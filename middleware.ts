@@ -15,7 +15,9 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   const pathname = new URL(req.url).pathname;
 
-  if (req.method === "POST") return;
+  if (req.method === "POST" && pathname === "/dashboard") {
+    return;
+  }
 
   if (userId && pathname === "/") {
     try {
