@@ -25,6 +25,7 @@ export const createCategory = mutation({
   handler: async (ctx, { clerkId, type, name, icon }) => {
     const existingCategory = await ctx.db
       .query("categories")
+      .filter((q) => q.eq(q.field("clerkId"), clerkId))
       .filter((q) => q.eq(q.field("name"), name))
       .first();
 

@@ -44,6 +44,9 @@ const Overview = () => {
     type: "expense",
   });
 
+  console.log(incomeTransactions, "incomeTransactions");
+  console.log(incomeCategories, "incomeCategories");
+
   useEffect(() => {
     if (
       incomeTransactions &&
