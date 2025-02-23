@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +11,17 @@ const CategoriesFinancieres = ({
   expenseCategories: any;
   loading: boolean;
 }) => {
+  const sortedIncomeCategories = useMemo(() => {
+    return incomeCategories
+      ?.filter((category: any) => category.percentage > 0)
+      .sort((a: any, b: any) => b.percentage - a.percentage);
+  }, [incomeCategories]);
+
+  const sortedExpenseCategories = useMemo(() => {
+    return expenseCategories
+      ?.filter((category: any) => category.percentage > 0)
+      .sort((a: any, b: any) => b.percentage - a.percentage);
+  }, [expenseCategories]);
   return (
     <div className="grid gap-4 md:grid-cols-2 flex-grow">
       <div className="flex flex-col h-80">
@@ -23,8 +34,8 @@ const CategoriesFinancieres = ({
             </h3>
 
             <div className="space-y-4">
-              {incomeCategories?.length > 0 ? (
-                incomeCategories?.map((category: any, index: any) => (
+              {sortedIncomeCategories?.length > 0 ? (
+                sortedIncomeCategories?.map((category: any, index: any) => (
                   <div key={index} className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>{category.name + " " + category.icon}</span>
@@ -61,8 +72,8 @@ const CategoriesFinancieres = ({
             </h3>
 
             <div className="space-y-4">
-              {expenseCategories?.length > 0 ? (
-                expenseCategories?.map((category: any, index: any) => (
+              {sortedExpenseCategories?.length > 0 ? (
+                sortedExpenseCategories?.map((category: any, index: any) => (
                   <div key={index} className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>{category.name + " " + category.icon}</span>

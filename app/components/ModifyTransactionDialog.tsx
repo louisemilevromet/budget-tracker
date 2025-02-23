@@ -72,7 +72,12 @@ const ModifyTransactionDialog = ({
     const { name, value } = e.target;
     setModifiedTransaction((prev) => ({
       ...prev,
-      [name]: name === "amount" ? parseFloat(value) : value,
+      [name]:
+        name === "amount"
+          ? isNaN(parseFloat(value))
+            ? 0
+            : parseFloat(value)
+          : value,
     }));
   };
 
@@ -139,6 +144,7 @@ const ModifyTransactionDialog = ({
               id="amount"
               name="amount"
               type="number"
+              min={0.01}
               value={modifiedTransaction.amount}
               onChange={handleChange}
               className="col-span-3"
@@ -195,7 +201,13 @@ const ModifyTransactionDialog = ({
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleConfirm}>
+          <Button
+            type="submit"
+            onClick={handleConfirm}
+            disabled={
+              modifiedTransaction.amount <= 0 || !modifiedTransaction.amount
+            }
+          >
             Save changes
           </Button>
         </DialogFooter>
